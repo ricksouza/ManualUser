@@ -1,0 +1,37 @@
+% !Mode:: "TeX:UTF-8"
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%       Visão geral     %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Visão Geral}
+
+O sistema de emissão de certificados digitais pessoa ICPEdu (Infraestrutura de Chaves Públicas para Ensino e Pesquisa) foi desenvolvido para gerenciar o ciclo de vida do certificado pessoa, desde de sua emissão à sua revogação e a manutenção da respectiva Lista de Certificados Revogados (LCR).
+
+O ciclo de vida do certificado digital tem início no momento da sua emissão. 
+A revogação de um certificado é iniciada quando as informações contidas no certificado não são mais válidas e/ou necessitam ser atualizadas. Dentre os motivos da revogação podemos citar:
+
+\begin{itemize}
+  \item Alteração de dados que identificam o proprietário do certificado;
+  \item Desvinculação do proprietário do certificado;
+  \item Desvinculação do proprietário do certificado com a entidade que o emitiu;
+  \item Atualização dos algoritmos criptográficos;
+\end{itemize}
+
+O final do processo de revogação do certificado digital é sua publicação na Lista de Certificados Revogados (LCR).
+
+Os usuários estão divididos em 3 perfis:
+
+\begin{itemize}
+  \item \textbf{Administrador}: responsável por criar os usuários, cadastrar módulos de segurança criptográficos, entre outras operações;
+  \item \textbf{Operador}: responsável pela operação da organização para a qual foi cadastrado.
+  \item \textbf{Usuário final}: responsável por solicitar e emitir seu certificado digital pessoal e solicitar a revogação do mesmo.
+\end{itemize}
+
+Por questões de segurança, foi observada a necessidade da criação de 2 usuários com privilégios distintos, separando o controle operacional do administrativo. Ao longo deste documento serão explicados com mais detalhes as funções de cada usuário.
+
+O presente manual pode ser utilizado em qualquer um dos ambientes implantados (Teste, Homologação e Produção). 
+
+\section{Público-alvo}
+
+Este manual destina-se a todos os usuários que estiverem utilizando, ou que pretendem utilizar o sistema de emissão de certificados ICPEdu, desenvolvido pelo Laboratório de Segurança em Computação (LabSEC) da Universidade Federal de Santa Catarina (UFSC), em parceria com a Rede Nacional de Ensino e Pesquisa (RNP).
+
+\nocite{*}

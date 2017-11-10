@@ -1,0 +1,145 @@
+\section{Introdução}
+
+A instalação do sistema de emissão de certificados ICPEdu é feita de forma automatizada e todos os requisitos já são instalados junto com ele, quando executados os comandos necessários.
+
+\section{Pré-instalação}
+
+Prepare uma máquina com uma instalação Ubuntu 14.04 32 bits LTS. Abra o site do projeto (\textit{https://projetos.labsec.ufsc.br/saec}) e entre na página "Lançamento da versão 1.0.0", pois todos os arquivos que deverão ser baixados estão disponíveis nesse endereço.
+
+\section{Passo a passo}
+
+\subsection{Instalação via repositório apt}
+
+\begin{enumerate}
+  \item Primeiramente baixe a chave pública PGP do repositório, utilizando o comando:  
+  
+    \textit{\$ gpg --keyserver keyserver.ubuntu.com --recv-keys 0AC9A8D0} \\
+    
+    A seguinte mensagem deve aparecer durante a execução do comando:\\
+    gpg: Requisitando chave 0AC9A8D0 de servidor hkp - keyserver.ubuntu.com\\
+    gpg: Chave 0AC9A8D0: chave pública "LabSec APT Repository $<labsec-l@inf.ufsc.br>$" importada\\
+    gpg: Ultimamente não encontradas chaves confiáveis\\
+    gpg: Número total processado: 1\\
+    gpg:              importados: 1  (RSA: 1)
+    
+  \item Em seguida, adicione a chave do chaveiro do apt com o comando:  
+  
+  \textit{\$ gpg --armor --export 0AC9A8D0 | sudo apt-key add -}
+  
+  \item Baixe o script configureRepository.sh e execute:  
+  
+  \textit{\$ sudo chmod +x configureRepository.sh}\\
+ \textit{\$ sudo ./configureRepository.sh}
+  
+  \item Atualize a lista de pacotes do apt:  
+  
+  \textit{\$ sudo apt-get update}
+  
+  \item E instale o sistema:  
+  
+  \textit{\$ sudo apt-get install saec}
+  
+  \item Para acessar, basta abrir um navegador de sua escolha e digitar: 
+  
+  \textit{https://ipdasuamaquina:40444}.
+\end{enumerate}
+
+\subsection{Instalação a partir do código fonte}
+
+\begin{enumerate}
+  \item Primeiramente baixe o sistema de emissão de certificados ICPEdu e extraia os arquivos. Entre no diretório onde está a pasta descompactada e dê permissão de execução no arquivo \textit{wgets.sh}:  
+  
+    \textit{\$ cd diretório/} \\
+    \textit{\$ chmod +x scripts/wgets.sh} \\
+    \textit{\$ ./scripts/wgets.sh}
+    
+  \item Baixe e instale os arquivos \textit{ LibCryptoSEC} e \textit{PHP5-LibCryptoSEC}, disponíveis no site do projeto.
+  
+  \item Instale o php5 e seus módulos e reinicie o apache:  
+  
+    \textit{\$ sudo apt-get install postgresql} \\
+    \textit{\$ sudo apt-get install php5 php5-sqlite php5-ldap php5-mcrypt php5-dev php5-pgsql} \\
+    \textit{\$ sudo service apache2 restart}
+  
+  \item Instale o banco de dados:  
+  
+    \textit{\$ sudo apt-get install pgadmin3} \\
+    \textit{\$ sudo -u postgres psql} \\
+    \textit{\$ sudo passwd postgres}
+  
+  \item Digite e redigite sua senha. Feito isso, entre com o usuário postgres e altere a senha para conectar ao banco:  
+  
+    \textit{\$ su postgres}\\
+    \textit{\$ psql -c "ALTER USER postgres WITH PASSWORD '1234'" -d template1}
+    
+  \item Para criar tabelas e popular o banco de dados, abra o pgadmin3 e clique no botão \textit{add conection to a server}. Peencha os campos com as seguintes informações: 
+  
+  Name: saec\\
+  Host: localhost\\
+  Port: 5432\\
+  Username: postgres\\
+  Password: 1234*
+  
+  \item Clique com o botão direito em \textit{Databases}, \textit{New Database}. Preencha o campo:
+  
+  Name: saec\_dev
+  
+  \item Clique no botão \textit{Execute arbitrary SQL queries} (ao lado do botão que se parece com uma lixeira) e execute os arquivos \textit{createDatabase.sql} e \textit{populateDatabase.sql}, seguindo o caminho:
+  
+    diretórioRaizDoProjeto/application/modules/db/sql/createDatabase.sql \\
+    diretórioRaizDoProjeto/application/modules/db/sql/populateDatabase.sql
+  
+  \item Instale e habilite o módulo do Shibboleth:
+  
+    \textit{\$ sudo apt-get install libapache2-mod-shib2} \\
+    \textit{\$ sudo a2enmod ssl} \\
+    \textit{\$ sudo a2enmod shib2}\\
+    \textit{\$ sudo a2enmod rewrite}\\
+    \textit{\$ sudo apt-get install libp11-dev}\\
+    \textit{\$ sudo php5enmod mcrypt}
+    
+    \item Gere a chave e o certificado ssl:
+    
+      \textit{\$ openssl req -out saec.csr -new -newkey rsa:2048** -nodes -keyout saec.key} \\
+      \textit{\$ openssl req -x509 -nodes -days 365** -newkey rsa:2048** -keyout saec.key -out saec.crt} \\
+      \textit{\$ sudo mv saec.key /etc/shibboleth/}\\
+      \textit{\$ sudo mv saec.crt /etc/ssl/certs/}
+      
+    \item Crie o Virtual Host:
+    
+      \textit{\$ sudo mv diretorioraizdoprojeto/\_util/packages\_generator/SAEC/etc/apache2/sites-available/saec\_default /etc/apache2/sites-available/saec.conf}
+    
+    \item Abra com algum editor de texto e modifique as seguintes configurações:
+    
+    DocumentRoot "caminhoAbsolutoParaODiretórioRaizDoProjeto/diretórioRaizDoProjeto/public" \\
+    SSLCertificateFile /etc/ssl/certs/saec.crt \\
+    SSLCertificateKeyFile /etc/shibboleth/saec.key \\
+    DocumentRoot "caminhoAbsolutoParaODiretórioRaizDoProjeto/diretórioRaizDoProjeto/public" \\
+    Directory "caminhoAbsolutoParaODiretórioRaizDoProjeto/diretórioRaizDoProjeto/public" \\
+    Directory "caminhoAbsolutoParaODiretórioRaizDoProjeto/diretórioRaizDoProjeto/public/signup" 
+    
+    \item Crie uma pasta para os logs do sistema:
+    
+    \textit{\$ sudo mkdir /var/log/apache2/saec}
+    
+    \item Reinicie o apache:
+    
+    \textit{\$ sudo service apache2 restart}\\
+    \textit{\$ sudo a2ensite saec}\\
+    \textit{\$ sudo service apache2 reload}
+    
+    \item Dê permissão total de acesso para o seu diretório do projeto:
+    
+    \textit{\$ sudo chmod -R 777 ~/diretorio}
+    
+  \item Para acessar o sistema de emissão de certificados ICPEdu, basta abrir um navegador de sua escolha e digitar: 
+  
+  \textit{https://ipdasuamaquina:40444}.
+\end{enumerate}
+    \subsubsection{Notas}
+    
+    \begin{itemize}
+  \item \textbf{Senha padrão}: A senha padrão "1234" é sugerida pois já está salva no banco de dados. Caso seja escolhida uma senha diferente, a mesma deverá ser alterada no banco de dados posteriormente;
+  \item \textbf{Atributos padrão}: O tamanho da chave e o número de dias são sugestões, podendo ser alterados.
+\end{itemize}
+    
